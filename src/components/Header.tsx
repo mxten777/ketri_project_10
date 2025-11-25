@@ -151,7 +151,11 @@ const Header = () => {
               onClick={() => setIsOpen(!isOpen)}
               className="lg:hidden p-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
             >
-              {isOpen ? <X size={24} /> : <Menu size={24} />}
+              {isOpen ? (
+                <X size={24} className="text-gray-700 dark:text-gray-200" />
+              ) : (
+                <Menu size={24} className="text-gray-700 dark:text-gray-200" />
+              )}
             </button>
           </div>
         </div>
