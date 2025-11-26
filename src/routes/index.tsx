@@ -29,6 +29,7 @@ import AsbestosRemoval from '../pages/asbestos/AsbestosRemoval';
 import AsbestosRisk from '../pages/asbestos/AsbestosRisk';
 import AsbestosAir from '../pages/asbestos/AsbestosAir';
 import Notices from '../pages/Notices';
+import Admin from '../pages/Admin';
 import Privacy from '../pages/footer/Privacy';
 import Accessibility from '../pages/footer/Accessibility';
 import Copyright from '../pages/footer/Copyright';
@@ -66,6 +67,7 @@ const AppRoutes = () => {
       <Route path="/asbestos/risk" element={<AsbestosRisk />} />
       <Route path="/asbestos/air" element={<AsbestosAir />} />
       <Route path="/notices" element={<Notices />} />
+      <Route path="/admin" element={<Admin />} />
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/accessibility" element={<Accessibility />} />
       <Route path="/copyright" element={<Copyright />} />

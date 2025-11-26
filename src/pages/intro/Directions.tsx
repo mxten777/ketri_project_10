@@ -1,33 +1,58 @@
 import { motion } from 'framer-motion';
 import { MapPin, Phone, Mail, Clock, Car, Train, Bus, Navigation, AlertCircle, CheckCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../../firebase/config';
+
+interface ContactItem {
+  id: string;
+  title: string;
+  content: string[];
+  color: string;
+}
 
 const Directions = () => {
-  const contactInfo = [
-    {
-      icon: MapPin,
-      title: '주소',
-      content: ['서울특별시 강남구 역삼동 123-45', 'KETRI 빌딩 5층'],
-      color: 'from-blue-400 to-blue-600',
-    },
-    {
-      icon: Phone,
-      title: '전화',
-      content: ['02-555-0123 (대표)', '02-555-0124 (팩스)'],
-      color: 'from-green-400 to-green-600',
-    },
-    {
-      icon: Mail,
-      title: '이메일',
-      content: ['info@ketri.co.kr', 'support@ketri.co.kr'],
-      color: 'from-purple-400 to-purple-600',
-    },
-    {
-      icon: Clock,
-      title: '업무 시간',
-      content: ['평일 09:00 - 18:00', '점심 12:00 - 13:00'],
-      color: 'from-orange-400 to-orange-600',
-    },
-  ];
+  const [contactInfo, setContactInfo] = useState<ContactItem[]>([]);
+
+  useEffect(() => {
+    const fetchContactInfo = async () => {
+      try {
+        const q = collection(db, 'contact');
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+          const contactData = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          })) as ContactItem[];
+          setContactInfo(contactData);
+        } else {
+          setContactInfo([]);
+        }
+      } catch (error) {
+        console.error('연락처 정보 로딩 실패:', error);
+        setContactInfo([]);
+      }
+    };
+
+    fetchContactInfo();
+  }, []);
+
+  // 아이콘 매핑
+  const getIcon = (title: string) => {
+    switch (title) {
+      case '주소': return MapPin;
+      case '전화': return Phone;
+      case '이메일': return Mail;
+      case '업무 시간': return Clock;
+      default: return MapPin;
+    }
+  };
+
+  const contactInfoWithIcons = contactInfo.map(item => ({
+    ...item,
+    icon: getIcon(item.title),
+  }));
 
   const transportOptions = [
     {
@@ -154,36 +179,36 @@ const Directions = () => {
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {contactInfo.map((info, index) => (
-                <motion.div
-                  key={info.title}
-                  initial={{ y: 30, opacity: 0 }}
-                  whileInView={{ y: 0, opacity: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1, duration: 0.6 }}
-                  whileHover={{ y: -5, scale: 1.02 }}
-                  className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-soft hover:shadow-large border border-gray-100 dark:border-gray-700 transition-all duration-300"
-                >
+              {contactInfoWithIcons.map((info, index) => (
                   <motion.div
-                    whileHover={{ scale: 1.1, rotate: 5 }}
-                    className={`inline-flex items-center justify-center w-14 h-14 bg-gradient-to-r ${info.color} rounded-xl mb-6 shadow-medium`}
+                    key={info.id}
+                    initial={{ y: 30, opacity: 0 }}
+                    whileInView={{ y: 0, opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1, duration: 0.6 }}
+                    whileHover={{ y: -5, scale: 1.02 }}
+                    className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-soft hover:shadow-large border border-gray-100 dark:border-gray-700 transition-all duration-300"
                   >
-                    <info.icon className="w-7 h-7 text-white" />
+                    <motion.div
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      className={`inline-flex items-center justify-center w-14 h-14 bg-gradient-to-r ${info.color} rounded-xl mb-6 shadow-medium`}
+                    >
+                      <info.icon className="w-7 h-7 text-white" />
+                    </motion.div>
+
+                    <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">
+                      {info.title}
+                    </h3>
+
+                    <div className="space-y-2">
+                      {info.content.map((line, lineIndex) => (
+                        <p key={lineIndex} className="text-secondary-600 dark:text-secondary-400">
+                          {line}
+                        </p>
+                      ))}
+                    </div>
                   </motion.div>
-
-                  <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">
-                    {info.title}
-                  </h3>
-
-                  <div className="space-y-2">
-                    {info.content.map((line, lineIndex) => (
-                      <p key={lineIndex} className="text-secondary-600 dark:text-secondary-400">
-                        {line}
-                      </p>
-                    ))}
-                  </div>
-                </motion.div>
-              ))}
+                ))}
             </div>
           </motion.div>
 

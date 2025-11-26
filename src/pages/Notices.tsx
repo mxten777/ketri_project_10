@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { db } from '../firebase/config';
 
@@ -14,24 +14,6 @@ interface Notice {
 const Notices = () => {
   const [notices, setNotices] = useState<Notice[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // 샘플 데이터 (Firebase 연결 실패 시 사용)
-  const sampleNotices = useMemo<Notice[]>(() => [
-    {
-      id: '1',
-      title: '2025년 신년 인사',
-      content: '한국환경안전연구소의 새로운 한 해를 맞이하여...',
-      date: '2025-01-01',
-      important: true,
-    },
-    {
-      id: '2',
-      title: '시스템 점검 안내',
-      content: '2025년 1월 15일 시스템 점검이 예정되어 있습니다.',
-      date: '2025-01-10',
-      important: false,
-    },
-  ], []);
 
   useEffect(() => {
     const fetchNotices = async () => {
@@ -48,20 +30,20 @@ const Notices = () => {
           })) as Notice[];
           setNotices(noticesData);
         } else {
-          // Firebase 데이터가 없으면 샘플 데이터 사용
-          setNotices(sampleNotices);
+          // Firebase 데이터가 없으면 빈 배열 사용
+          setNotices([]);
         }
       } catch (error) {
         console.error('공지사항 로딩 실패:', error);
-        // 에러 시 샘플 데이터 사용
-        setNotices(sampleNotices);
+        // 에러 시 빈 배열 사용
+        setNotices([]);
       } finally {
         setLoading(false);
       }
     };
 
     fetchNotices();
-  }, [sampleNotices]);
+  }, []);
 
   return (
     <motion.div

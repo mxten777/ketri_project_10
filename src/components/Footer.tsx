@@ -1,8 +1,49 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../firebase/config';
+
+interface ContactItem {
+  id: string;
+  title: string;
+  content: string[];
+  color: string;
+}
 
 const Footer = () => {
   const navigate = useNavigate();
+  const [contactInfo, setContactInfo] = useState<ContactItem[]>([]);
+
+  useEffect(() => {
+    const fetchContactInfo = async () => {
+      try {
+        const q = collection(db, 'contact');
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+          const contactData = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          })) as ContactItem[];
+          setContactInfo(contactData);
+        } else {
+          setContactInfo([]);
+        }
+      } catch (error) {
+        console.error('연락처 정보 로딩 실패:', error);
+        setContactInfo([]);
+      }
+    };
+
+    fetchContactInfo();
+  }, []);
+
+  // 연락처 정보를 객체로 변환
+  const contactMap = contactInfo.reduce((acc, item) => {
+    acc[item.title] = item.content[0];
+    return acc;
+  }, {} as Record<string, string>);
 
   const handleNavigation = (path: string) => {
     navigate(path);
@@ -113,10 +154,10 @@ const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4">연락처</h4>
             <div className="text-gray-400 space-y-2">
-              <p>📍 서울특별시 강남구 역삼동 123-45</p>
-              <p>📞 02-555-0123</p>
-              <p>📧 info@ketri.co.kr</p>
-              <p>🕒 월-금 09:00-18:00</p>
+              <p>📍 {contactMap['주소'] || '서울특별시 강남구 역삼동 123-45'}</p>
+              <p>📞 {contactMap['전화'] || '02-555-0123'}</p>
+              <p>📧 {contactMap['이메일'] || 'info@ketri.co.kr'}</p>
+              <p>🕒 {contactMap['업무 시간'] || '월-금 09:00-18:00'}</p>
             </div>
           </div>
         </motion.div>
