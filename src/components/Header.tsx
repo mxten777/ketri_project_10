@@ -92,8 +92,12 @@ const Header = () => {
     <header className="bg-white dark:bg-gray-900 shadow-lg sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center py-4">
-          <Link to="/" className="text-2xl font-bold text-primary-600 dark:text-primary-400">
-            KETRI
+          <Link to="/" className="flex items-center space-x-3">
+            <img 
+              src="/images/logo_horizontal.png" 
+              alt="KETRI 로고" 
+              className="h-10 w-auto dark:brightness-0 dark:invert transition-all duration-200"
+            />
           </Link>
 
           {/* Desktop Navigation */}
